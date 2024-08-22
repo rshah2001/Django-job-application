@@ -2,6 +2,8 @@ from django.shortcuts import render
 from .forms import ApplicationForms
 from .models import Form
 from django.contrib import messages
+from django.core.mail import EmailMessage
+
 
 def index(request):
     # this is if user presses the send/ submit button
@@ -15,7 +17,15 @@ def index(request):
             occupation = form.cleaned_data["occupation"]
 
             Form.objects.create(first_name=first_name, last_name= last_name, email=email, date=date,
-                               occupation=occupation)
-            messages.success(request, f"{first_name}, your form was successfully submitted")
+                                occupation=occupation)
 
+            message_body = f"A new application was submitted. Thank you. {first_name}"
+
+            email_message = EmailMessage("Form Submission Confirmation", message_body, to=[email])
+            email_message.send()
+
+            messages.success(request, "Your form was successfully submitted")
     return render(request, "index.html")
+
+
+
